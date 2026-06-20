@@ -1,37 +1,75 @@
-script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { getTenants } from '@/services/tenantService';
 
-const router = useRouter()
+const router = useRouter();
 
-const tenantId = ref(localStorage.getItem('tenant_id') || '')
+const tenants = ref([]);
+const selectedTenant = ref('');
+
+onMounted(async () => {
+    tenants.value = await getTenants();
+});
 
 const saveTenant = () => {
-    if (!tenantId.value.trim()) {
-        alert('Debe ingresar un Tenant ID')
-        return
+    if (!selectedTenant.value) {
+        alert('Seleccione un tenant');
+        return;
     }
 
-    localStorage.setItem('tenant_id', tenantId.value)
+    localStorage.setItem(
+        'tenant_id',
+        selectedTenant.value
+    );
 
-    alert('Tenant guardado correctamente')
-
-    router.push('/login')
-}
+    router.push('/dashboard');
+};
 </script>
 
 <template>
-    <div>
-        <h1>Seleccionar Tenant</h1>
+    <div class="container mt-5">
 
-        <input
-            v-model="tenantId"
-            type="text"
-            placeholder="Ingrese UUID del Tenant"
-        />
+        <div class="card shadow">
 
-        <button @click="saveTenant">
-            Guardar
-        </button>
+            <div class="card-header">
+                Selección de Tenant
+            </div>
+
+            <div class="card-body">
+
+                <label class="form-label">
+                    Tenant
+                </label>
+
+                <select
+                    v-model="selectedTenant"
+                    class="form-select"
+                >
+                    <option value="">
+                        Seleccione un tenant
+                    </option>
+
+                    <option
+                        v-for="tenant in tenants"
+                        :key="tenant.id"
+                        :value="tenant.id"
+                    >
+                        {{ tenant.name }}
+                    </option>
+
+                </select>
+
+                <button
+                    class="btn btn-primary mt-3"
+                    @click="saveTenant"
+                >
+                    Continuar
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 </template>

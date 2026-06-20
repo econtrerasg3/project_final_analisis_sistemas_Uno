@@ -29,3 +29,18 @@ const router = createRouter({
 router.beforeEach(authGuard);
 
 export default router;
+
+router.beforeEach((to, from, next) => {
+
+    const tenantId =
+        localStorage.getItem('tenant_id');
+
+    if (
+        !tenantId &&
+        to.path !== '/tenant'
+    ) {
+        return next('/tenant');
+    }
+
+    next();
+});

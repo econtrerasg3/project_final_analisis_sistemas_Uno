@@ -16,3 +16,10 @@ Route::middleware(['tenant', 'jwt.auth'])->group(function (): void {
 Route::middleware(['tenant', 'jwt.refresh'])->group(function (): void {
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 });
+
+use App\Http\Controllers\Api\V1\TenantController;
+
+Route::get(
+    '/tenants',
+    [TenantController::class, 'index']
+);
